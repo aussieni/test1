@@ -28,8 +28,6 @@ class Edge
   attr_reader :vertices
 
   def time_cost(cost_params)
-    puts "length: #{length}"
-    puts "speed: #{speed(cost_params.max_speed)}"
     (length / speed(cost_params.max_speed)) * cost_params.time_cost
   end
 
