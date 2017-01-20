@@ -19,7 +19,7 @@ class Quote
 end
 
 class Edge
-  def initialize(vertices, center, clockwise_from_index)
+  def initialize(vertices, center = nil, clockwise_from_index = nil)
     @vertices = vertices
     @center = center
     @clockwise_from_index = clockwise_from_index
@@ -30,4 +30,22 @@ class Edge
   end
 
   attr_reader :vertices, :center, :clockwise_from_index
+
+  def time_cost(cost_params)
+    length = Math.sqrt((vertices[1][0] - vertices[0][0]) ** 2 +
+                       (vertices[1][1] - vertices[0][1]) ** 2)
+    (length / cost_params.max_speed) * cost_params.time_cost
+  end
+end
+
+class CostParams
+  # Units: in, dollar/in^2, in/s, dollar/s.
+  def initialize(padding, material_cost, max_speed, time_cost)
+    @padding = padding
+    @material_cost = material_cost
+    @max_speed = max_speed
+    @time_cost = time_cost
+  end
+
+  attr_reader :padding, :material_cost, :max_speed, :time_cost
 end
