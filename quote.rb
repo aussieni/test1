@@ -21,5 +21,13 @@ class Edge
     @vertices = vertices
   end
 
+  def is_arc
+    !!center
+  end
+
+  def center
+    nil
+  end
+
   attr_reader :vertices
 end
