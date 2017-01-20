@@ -16,6 +16,12 @@ class Quote
   end
 
   attr_reader :edges
+
+  private
+
+  def time_cost(cost_params)
+    edges.map { |e| e.time_cost(cost_params) }.reduce(0, :+)
+  end
 end
 
 class Edge
@@ -27,9 +33,19 @@ class Edge
 
   attr_reader :vertices
 
+  def material_cost(cost_params)
+    rect = BoundingRectangle.new(extreme_points)
+    padding = cost_params.padding
+    padded_area = (rect.x1 + padding - (rect.x0 - padding)) *
+                  (rect.y1 + padding - (rect.y0 - padding))
+    padded_area * cost_params.material_cost
+  end
+
   def time_cost(cost_params)
     (length / speed(cost_params.max_speed)) * cost_params.time_cost
   end
+
+  protected
 
   def distance(p0, p1)
     Math.sqrt((p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2)
@@ -45,6 +61,12 @@ end
 class LineSegment < Edge
   def is_arc
     false
+  end
+
+  private
+
+  def extreme_points
+    vertices
   end
 
   def length
@@ -69,6 +91,8 @@ class Arc < Edge
     true
   end
 
+  private
+
   def length
     shifted_vertices = vertices.map { |v| [v[0] - center[0], v[1] - center[1]] }
     angles = shifted_vertices.map { |v| Math::atan2(v[1], v[0]) }
@@ -85,6 +109,19 @@ class Arc < Edge
   def radius
     distance(vertices[0], center)
   end
+end
+
+class BoundingRectangle
+  def initialize(points)
+    x_values = points.map { |p| p[0] }
+    y_values = points.map { |p| p[1] }
+    @x0 = x_values.min
+    @x1 = x_values.max
+    @y0 = y_values.min
+    @y1 = y_values.max
+  end
+
+  attr_reader :x0, :x1, :y0, :y1
 end
 
 class CostParams
