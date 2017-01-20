@@ -47,6 +47,17 @@ class TestQuote < Test::Unit::TestCase
     assert_close 1.2 * 2.2 * 0.3, e.material_cost(@cost_params)
   end
 
+  def test_material_cost_arc
+    # Side length of isosceles right triangle with hypotenuse 1.
+    a = Math.sqrt(1.0 / 2.0)
+    
+    e0 = Edge.create([[0, 1], [1 + a, 1 - a]], [1, 1], 0)
+    assert_close 2.2 * (1 + a + 0.2) * 0.3, e0.material_cost(@cost_params)
+
+    e1 = Edge.create([[0, 1], [1 + a, 1 - a]], [1, 1], 1) 
+    assert_close (1 + a + 0.2) * 1.2 * 0.3, e1.material_cost(@cost_params)
+  end
+
   def assert_close(expected, actual)
     assert_in_delta expected, actual
   end

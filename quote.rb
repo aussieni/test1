@@ -93,13 +93,34 @@ class Arc < Edge
 
   private
 
+  def extreme_points
+    unit_circle_extremes = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+    circle_extremes = unit_circle_extremes.map do |p|
+      [p[0] * radius + center[0], p[1] * radius + center[1]]
+    end
+    included_circle_extremes = circle_extremes.find_all do |p|
+      in_cc_order(cc_vertices[0], p, cc_vertices[1])
+    end
+    vertices + included_circle_extremes
+  end
+
   def length
-    shifted_vertices = vertices.map { |v| [v[0] - center[0], v[1] - center[1]] }
-    angles = shifted_vertices.map { |v| Math::atan2(v[1], v[0]) }
-    cc_angle_diff = angles[1] - angles[0]
-    angle_diff = clockwise_from_index == 0 ? -cc_angle_diff : cc_angle_diff
-    angle_distance = angle_diff.modulo(2 * Math::PI)
-    angle_distance * radius
+    cc_angle_distance(cc_vertices) * radius
+  end
+
+  # Counter-clockwise, following the math standard.
+  def cc_vertices
+    clockwise_from_index == 0 ? vertices.reverse : vertices
+  end
+  
+  def cc_angle_distance(points)
+    shifted_points = points.map { |p| [p[0] - center[0], p[1] - center[1]] }
+    angles = shifted_points.map { |p| Math::atan2(p[1], p[0]) }
+    (angles[1] - angles[0]).modulo(2 * Math::PI)
+  end
+
+  def in_cc_order(p0, p1, p2)
+    cc_angle_distance([p0, p1]) <= cc_angle_distance([p0, p2])
   end
 
   def speed(max_speed)
