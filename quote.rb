@@ -9,7 +9,9 @@ class Quote
         position = data['Vertices'][v_id.to_s]['Position']
         ([position['X'], position['Y']])
       end
-      Edge.new(vertices)
+      center = e['Center'] && [e['Center']['X'], e['Center']['Y']]
+      clockwise_from_index = e['ClockwiseFrom'] && e['Vertices'].index(e['ClockwiseFrom'])
+      Edge.new(vertices, center, clockwise_from_index)
     end
   end
 
@@ -17,17 +19,15 @@ class Quote
 end
 
 class Edge
-  def initialize(vertices)
+  def initialize(vertices, center, clockwise_from_index)
     @vertices = vertices
+    @center = center
+    @clockwise_from_index = clockwise_from_index
   end
 
   def is_arc
     !!center
   end
 
-  def center
-    nil
-  end
-
-  attr_reader :vertices
+  attr_reader :vertices, :center, :clockwise_from_index
 end
