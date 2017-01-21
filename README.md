@@ -7,7 +7,7 @@ gem install json
 
 For example, to get a quote from a profile:
 ```
-ruby print_quote.rb Rectangle.json
+ruby print_quote.rb data/Rectangle.json
 ```
 
 To run the unit tests:

@@ -3,11 +3,11 @@ require 'test/unit'
  
 class TestQuote < Test::Unit::TestCase
   def setup
-    @cost_params = CostParams.new(0.1, 0.75, 0.5, 0.07)
+    @default_cost_params = CostParams.new(0.1, 0.75, 0.5, 0.07)
   end
   
   def test_parse
-    json = IO.read('CutCircularArc.json')
+    json = IO.read('data/CutCircularArc.json')
     quote = Quote.new(json)
     edges = quote.edges
     
@@ -25,22 +25,29 @@ class TestQuote < Test::Unit::TestCase
   end
 
   def test_overall0
-    json = IO.read('Rectangle.json')
-    cost = Quote.new(json).cost(@cost_params)
+    json = IO.read('data/Rectangle.json')
+    cost = Quote.new(json).cost(@default_cost_params)
     assert_close '14.10', cost
   end
 
   def test_overall1
-    json = IO.read('ExtrudeCircularArc.json')
-    cost = Quote.new(json).cost(@cost_params)
+    json = IO.read('data/ExtrudeCircularArc.json')
+    cost = Quote.new(json).cost(@default_cost_params)
     assert_close '4.47', cost
   end
 
   def test_overall2
-    json = IO.read('CutCircularArc.json')
-    cost = Quote.new(json).cost(@cost_params)
+    json = IO.read('data/CutCircularArc.json')
+    cost = Quote.new(json).cost(@default_cost_params)
     assert_close '4.06', cost
   end
+
+  """
+  def test_rotated
+    cost = Quote.new(json).cost(@default_cost_params)
+    assert_close '4.06', cost
+  end
+"""
 
   def test_time_cost_line_segment
     cost_params = CostParams.new(0.1, 0.3, 0.5, 0.01)
