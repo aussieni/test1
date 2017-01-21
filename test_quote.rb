@@ -42,10 +42,49 @@ class TestQuote < Test::Unit::TestCase
     assert_close '4.06', cost
   end
 
+  def test_bound_rotation
+    e = Edge.create([[1, 0], [0, 1]])
+    r = e.bound_rect
+    assert_close 0, r.x0
+    assert_close 1, r.x1
+    assert_close 0, r.y0
+    assert_close 1, r.y1
+
+    r = e.rotated(2 * Math::PI / 8).bound_rect
+    a = Math.sqrt(1.0 / 2.0)
+    assert_close -a, r.x0
+    assert_close a, r.x1
+    assert_close a, r.y0
+    assert_close a, r.y1
+  end
+
+    """
+  def test_rotated
+    json = IO.read('data/Diagonal.json')
+    cost = Quote.new(json).cost(@default_cost_params)
+    a = Math.sqrt(2)
+    material_cost = 0.1 * 0.1 * 0.75
+    length = a
+    speed = 0.5
+    time = length / speed
+    time_cost = time * 0.07
+    assert_equal sprintf('%.2f', material_cost + time_cost), cost
+  end
+"""
+  
   """
   def test_rotated
+    json = IO.read('data/TiltedHalfCircle.json')
     cost = Quote.new(json).cost(@default_cost_params)
-    assert_close '4.06', cost
+    material_cost = 1.1 * 0.6 * 0.75
+    line_segment_length = 2
+    line_segment_speed = 0.5
+    arc_length = 2 * Math::PI
+    arc_speed = 0.5 * Math.exp(-1)
+    time = line_segment_length / line_segment_speed +
+           arc_length / arc_speed
+    time_cost = time * 0.07
+    assert_equal sprintf('%.2f', material_cost + time_cost), cost
   end
 """
 

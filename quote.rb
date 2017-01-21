@@ -22,15 +22,27 @@ class Quote
     sprintf('%.2f', cost)
   end
 
+  # We divide the circle into this many parts to find the best rotation.
+  ANGLE_RESOLUTION = 8
+
   private
 
   def material_cost(cost_params)
-    rect = edges.map { |e| e.bound_rect }
+    padded_areas = (0...ANGLE_RESOLUTION).to_a.map do |i|
+      angle = (i.to_f / ANGLE_RESOLUTION) * 2 * Math::PI
+      rect = bound_rect(angle)
+      puts "angle #{angle}, rect #{rect}"
+      (rect.x1 - rect.x0 + cost_params.padding) *
+        (rect.y1 - rect.y0 + cost_params.padding)
+    end
+    puts "padded_areas: #{padded_areas}"
+    padded_areas.min * cost_params.material_cost
+  end
+
+  def bound_rect(angle)
+    edges.map { |e| e.rotated(angle) }
+       .map { |e| e.bound_rect }
       .reduce { |acc, new_value| acc.union(new_value) }
-    padding = cost_params.padding
-    padded_area = (rect.x1 - rect.x0 + padding) *
-                  (rect.y1 - rect.y0 + padding)
-    padded_area * cost_params.material_cost
   end
 
   def time_cost(cost_params)
@@ -61,6 +73,13 @@ class Edge
     Math.sqrt((p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2)
   end
 
+  def rotated_point(p, angle)
+    [
+      Math.cos(angle) * p[0] - Math.sin(angle) * p[1],
+      Math.sin(angle) * p[0] + Math.cos(angle) * p[1]
+    ]
+  end
+
   private
   
   def initialize(vertices)
@@ -71,6 +90,10 @@ end
 class LineSegment < Edge
   def is_arc
     false
+  end
+
+  def rotated(angle)
+    LineSegment.new(vertices.map { |v| rotated_point(v, angle) })
   end
 
   private
@@ -99,6 +122,11 @@ class Arc < Edge
 
   def is_arc
     true
+  end
+
+  def rotated(angle)
+    Arc.new(vertices.map { |v| rotated_point(v, angle) }, 
+            rotated_point(center, angle), clockwise_from_index)
   end
 
   private
