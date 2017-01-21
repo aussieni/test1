@@ -44,7 +44,7 @@ class TestQuote < Test::Unit::TestCase
 
   def test_material_cost_line_segment
     e = Edge.create([[0, 1], [2, 0]])
-    assert_close 1.2 * 2.2 * 0.3, e.material_cost(@cost_params)
+    assert_equal BoundRect.new([[0, 0], [2, 1]]), e.bound_rect
   end
 
   def test_material_cost_arc
@@ -52,10 +52,10 @@ class TestQuote < Test::Unit::TestCase
     a = Math.sqrt(1.0 / 2.0)
     
     e0 = Edge.create([[0, 1], [1 + a, 1 - a]], [1, 1], 0)
-    assert_close 2.2 * (1 + a + 0.2) * 0.3, e0.material_cost(@cost_params)
+    assert_equal BoundRect.new([[0, 1 - a], [2, 2]]), e0.bound_rect
 
     e1 = Edge.create([[0, 1], [1 + a, 1 - a]], [1, 1], 1) 
-    assert_close (1 + a + 0.2) * 1.2 * 0.3, e1.material_cost(@cost_params)
+    assert_equal BoundRect.new([[0, 0], [1 + a, 1]]), e1.bound_rect
   end
 
   def assert_close(expected, actual)

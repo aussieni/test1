@@ -19,6 +19,10 @@ class Quote
 
   private
 
+  #def material_cost(cost_params)
+  #  edges.map { |e| 
+  #end
+
   def time_cost(cost_params)
     edges.map { |e| e.time_cost(cost_params) }.reduce(0, :+)
   end
@@ -33,12 +37,12 @@ class Edge
 
   attr_reader :vertices
 
-  def material_cost(cost_params)
-    rect = BoundingRectangle.new(extreme_points)
-    padding = cost_params.padding
-    padded_area = (rect.x1 + padding - (rect.x0 - padding)) *
-                  (rect.y1 + padding - (rect.y0 - padding))
-    padded_area * cost_params.material_cost
+  def bound_rect
+    rect = BoundRect.new(extreme_points)
+    #padding = cost_params.padding
+    #padded_area = (rect.x1 + padding - (rect.x0 - padding)) *
+    #              (rect.y1 + padding - (rect.y0 - padding))
+    #padded_area * cost_params.material_cost
   end
 
   def time_cost(cost_params)
@@ -132,7 +136,7 @@ class Arc < Edge
   end
 end
 
-class BoundingRectangle
+class BoundRect
   def initialize(points)
     x_values = points.map { |p| p[0] }
     y_values = points.map { |p| p[1] }
@@ -142,7 +146,16 @@ class BoundingRectangle
     @y1 = y_values.max
   end
 
+  def union(boundRect)
+    BoundRect.new([[x0, y0], [x1, y1],
+                   [boundRect.x0, boundRect.y0], [boundRect.x1, boundRect.y1]])
+  end
+
   attr_reader :x0, :x1, :y0, :y1
+
+  def ==(other)
+    x0 == other.x0 && x1 == other.x1 && y0 == other.y0 && y1 == other.y1
+  end
 end
 
 class CostParams
