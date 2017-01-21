@@ -18,8 +18,6 @@ class Quote
   attr_reader :edges
 
   def cost(cost_params)
-    #puts "material: #{material_cost(cost_params)}"
-    #puts "time: #{time_cost(cost_params)}"
     cost = material_cost(cost_params) + time_cost(cost_params)
     sprintf('%.2f', cost)
   end
@@ -29,11 +27,9 @@ class Quote
   def material_cost(cost_params)
     rect = edges.map { |e| e.bound_rect }
       .reduce { |acc, new_value| acc.union(new_value) }
-    #puts "rect: #{rect}"
     padding = cost_params.padding
     padded_area = (rect.x1 - rect.x0 + padding) *
                   (rect.y1 - rect.y0 + padding)
-    #puts "padded area: #{padded_area}"
     padded_area * cost_params.material_cost
   end
 

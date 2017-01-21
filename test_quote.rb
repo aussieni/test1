@@ -2,6 +2,10 @@ require_relative 'quote'
 require 'test/unit'
  
 class TestQuote < Test::Unit::TestCase
+  def setup
+    @cost_params = CostParams.new(0.1, 0.75, 0.5, 0.07)
+  end
+  
   def test_parse
     json = IO.read('CutCircularArc.json')
     quote = Quote.new(json)
@@ -20,11 +24,22 @@ class TestQuote < Test::Unit::TestCase
     assert_equal(0, edge1.clockwise_from_index)
   end
 
-  def test_overall
+  def test_overall0
     json = IO.read('Rectangle.json')
-    cost_params = CostParams.new(0.1, 0.75, 0.5, 0.07)
-    cost = Quote.new(json).cost(cost_params)
+    cost = Quote.new(json).cost(@cost_params)
     assert_close '14.10', cost
+  end
+
+  def test_overall1
+    json = IO.read('ExtrudeCircularArc.json')
+    cost = Quote.new(json).cost(@cost_params)
+    assert_close '4.47', cost
+  end
+
+  def test_overall2
+    json = IO.read('CutCircularArc.json')
+    cost = Quote.new(json).cost(@cost_params)
+    assert_close '4.06', cost
   end
 
   def test_time_cost_line_segment
