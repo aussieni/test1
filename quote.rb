@@ -17,11 +17,25 @@ class Quote
 
   attr_reader :edges
 
+  def cost(cost_params)
+    #puts "material: #{material_cost(cost_params)}"
+    #puts "time: #{time_cost(cost_params)}"
+    cost = material_cost(cost_params) + time_cost(cost_params)
+    sprintf('%.2f', cost)
+  end
+
   private
 
-  #def material_cost(cost_params)
-  #  edges.map { |e| 
-  #end
+  def material_cost(cost_params)
+    rect = edges.map { |e| e.bound_rect }
+      .reduce { |acc, new_value| acc.union(new_value) }
+    #puts "rect: #{rect}"
+    padding = cost_params.padding
+    padded_area = (rect.x1 - rect.x0 + padding) *
+                  (rect.y1 - rect.y0 + padding)
+    #puts "padded area: #{padded_area}"
+    padded_area * cost_params.material_cost
+  end
 
   def time_cost(cost_params)
     edges.map { |e| e.time_cost(cost_params) }.reduce(0, :+)
@@ -39,10 +53,6 @@ class Edge
 
   def bound_rect
     rect = BoundRect.new(extreme_points)
-    #padding = cost_params.padding
-    #padded_area = (rect.x1 + padding - (rect.x0 - padding)) *
-    #              (rect.y1 + padding - (rect.y0 - padding))
-    #padded_area * cost_params.material_cost
   end
 
   def time_cost(cost_params)
@@ -155,6 +165,10 @@ class BoundRect
 
   def ==(other)
     x0 == other.x0 && x1 == other.x1 && y0 == other.y0 && y1 == other.y1
+  end
+
+  def to_s
+    "[#{x0}, #{x1}]x[#{y0}, #{y1}]"
   end
 end
 
