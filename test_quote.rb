@@ -25,37 +25,15 @@ class TestQuote < Test::Unit::TestCase
   end
 
   def test_overall0
-    json = IO.read('data/Rectangle.json')
-    cost = Quote.new(json).cost(@default_cost_params)
-    assert_close '14.10', cost
+    assert_file_result('data/Rectangle.json', '14.10')
   end
 
   def test_overall1
-    json = IO.read('data/ExtrudeCircularArc.json')
-    cost = Quote.new(json).cost(@default_cost_params)
-    assert_close '4.47', cost
+    assert_file_result('data/ExtrudeCircularArc.json', '4.47')
   end
 
   def test_overall2
-    json = IO.read('data/CutCircularArc.json')
-    cost = Quote.new(json).cost(@default_cost_params)
-    assert_close '4.06', cost
-  end
-
-  def test_edge_rotation
-    e = Edge.create([[1, 0], [0, 1]])
-    r = e.bound_rect
-    assert_close 0, r.x0
-    assert_close 1, r.x1
-    assert_close 0, r.y0
-    assert_close 1, r.y1
-
-    r = e.rotated(2 * Math::PI / 8).bound_rect
-    a = Math.sqrt(1.0 / 2.0)
-    assert_close -a, r.x0
-    assert_close a, r.x1
-    assert_close a, r.y0
-    assert_close a, r.y1
+    assert_file_result('data/CutCircularArc.json', '4.06')
   end
 
   def test_rotation
@@ -82,6 +60,28 @@ class TestQuote < Test::Unit::TestCase
            arc_length / arc_speed
     time_cost = time * 0.07
     assert_equal sprintf('%.2f', material_cost + time_cost), cost
+  end
+
+  def assert_file_result(file_path, expected_cost)
+    json = IO.read(file_path)
+    cost = Quote.new(json).cost(@default_cost_params)
+    assert_close expected_cost, cost
+  end
+
+  def test_edge_rotation
+    e = Edge.create([[1, 0], [0, 1]])
+    r = e.bound_rect
+    assert_close 0, r.x0
+    assert_close 1, r.x1
+    assert_close 0, r.y0
+    assert_close 1, r.y1
+
+    r = e.rotated(2 * Math::PI / 8).bound_rect
+    a = Math.sqrt(1.0 / 2.0)
+    assert_close -a, r.x0
+    assert_close a, r.x1
+    assert_close a, r.y0
+    assert_close a, r.y1
   end
 
   def test_time_cost_line_segment
