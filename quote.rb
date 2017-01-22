@@ -31,11 +31,9 @@ class Quote
     padded_areas = (0...ANGLE_RESOLUTION).to_a.map do |i|
       angle = (i.to_f / ANGLE_RESOLUTION) * 2 * Math::PI
       rect = bound_rect(angle)
-      puts "angle #{angle}, rect #{rect}"
       (rect.x1 - rect.x0 + cost_params.padding) *
         (rect.y1 - rect.y0 + cost_params.padding)
     end
-    puts "padded_areas: #{padded_areas}"
     padded_areas.min * cost_params.material_cost
   end
 

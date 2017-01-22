@@ -70,21 +70,19 @@ class TestQuote < Test::Unit::TestCase
     assert_equal sprintf('%.2f', material_cost + time_cost), cost
   end
   
-  """
   def test_rotation1
     json = IO.read('data/TiltedHalfCircle.json')
     cost = Quote.new(json).cost(@default_cost_params)
-    material_cost = 1.1 * 0.6 * 0.75
+    material_cost = 2.1 * 1.1 * 0.75
     line_segment_length = 2
     line_segment_speed = 0.5
-    arc_length = 2 * Math::PI
+    arc_length = Math::PI
     arc_speed = 0.5 * Math.exp(-1)
     time = line_segment_length / line_segment_speed +
            arc_length / arc_speed
     time_cost = time * 0.07
     assert_equal sprintf('%.2f', material_cost + time_cost), cost
   end
-"""
 
   def test_time_cost_line_segment
     cost_params = CostParams.new(0.1, 0.3, 0.5, 0.01)
