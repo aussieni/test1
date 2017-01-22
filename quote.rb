@@ -23,7 +23,8 @@ class Quote
   end
 
   # We divide the circle into this many parts to find the best rotation.
-  ANGLE_RESOLUTION = 8
+  # This gets us within 3 degrees.
+  ANGLE_RESOLUTION = 120
 
   private
 
@@ -58,6 +59,7 @@ class Edge
   attr_reader :vertices
 
   def bound_rect
+    # The "extreme points" are the ones which affect the boundary rect.
     rect = BoundRect.new(extreme_points)
   end
 
@@ -130,6 +132,7 @@ class Arc < Edge
   private
 
   def extreme_points
+    # Besides the endpoints, look at extreme points of the whole circle.
     unit_circle_extremes = [[1, 0], [0, 1], [-1, 0], [0, -1]]
     circle_extremes = unit_circle_extremes.map do |p|
       [p[0] * radius + center[0], p[1] * radius + center[1]]
@@ -144,7 +147,8 @@ class Arc < Edge
     cc_angle_distance(cc_vertices) * radius
   end
 
-  # Counter-clockwise, following the math standard.
+  # Internally, we follow the math convention that angles are
+  # counter-clockwise.
   def cc_vertices
     clockwise_from_index == 0 ? vertices.reverse : vertices
   end
